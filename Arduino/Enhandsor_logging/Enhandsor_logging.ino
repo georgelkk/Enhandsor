@@ -3,7 +3,7 @@
 // For Enahandsor Bottle prototype test in India
 // =====================================================
 // Nan-Wei Gong Feb 1st 2014
-// George Chang Sep.1st 2014 georgelkk4@gmail.ocm
+// George Chang Sep.1st 2014   georgelkk4@gmail.ocm
 // code available on github:
 // https://github.com/georgelkk/Enhandsor
 // =====================================================
@@ -13,8 +13,8 @@
 // 3. set FORCE_UPDATE_DATETIME before upload code 
 //
 // POWER PROFILE:
-// sleep mode     800 uMA
-// active mode    20  mA
+// sleep  mode     800 uMA
+// active mode      20  mA
 // =====================================================
 // --------------------
 // include
@@ -35,18 +35,17 @@
 #define TIME_MSG_LEN  11   // time sync to PC is HEADER followed by unix time_t as ten ascii digits
 #define TIME_HEADER  255   // Header tag for serial time sync message
 // --------------------
-// Var
+// globle variable
 // --------------------
 const int chipSelect = 4;
 int sleepStatus = 0;        // variable to store a request for sleep
 int led =9;
+int button1 = 0;
+int button2 = 0;            // This is to talk to the real time clock
 int wakePin1 = 2;
 int wakePin2 = 3;
 int analogPin = 0;
-int button1 = 0;
-int button2 = 0;            // This is to talk to the real time clock
 boolean FORCE_UPDATE_DATETIME= false;  // Force update in first time upload 
-// Global Variables 
 int i;   // ???
 byte m_second, m_minute, m_hour, m_dayOfWeek, m_dayOfMonth, m_month, m_year; 
 // current time and date you want to setup
@@ -90,11 +89,10 @@ void setup()
   // for the interrupt
   pinMode(wakePin1, INPUT);// button 1
   pinMode(wakePin2, INPUT);// button 2
-
   attachInterrupt(0, wakeUpNow1, RISING); // use interrupt 0 (pin 2) and run function
-                                      // wakeUpNow when pin 2 gets HIGH
+                                          // wakeUpNow when pin 2 gets HIGH
   attachInterrupt(1, wakeUpNow2, RISING); // use interrupt 1 (pin 2) and run function
-                                      // wakeUpNow when pin 3 gets HIGH
+                                          // wakeUpNow when pin 3 gets HIGH
 }
 
 // --------------------
@@ -151,6 +149,7 @@ void loop()
   }
 
 }
+
 // --------------------
 // unit function
 // --------------------
@@ -167,6 +166,7 @@ byte bcdToDec(byte val)
   return ( (val/16*10) + (val%16) );
 }
 
+// [sleep related function]
 void wakeUpNow1()        // here the interrupt is handled after wakeup for both button you blink that LED for a bit
 {
   //execute code here after wake-up before returning to the loop() function
@@ -200,7 +200,8 @@ void sleepNow()         // here we put the arduino to sleep
     detachInterrupt(1);
 }
 
-// [unit function]
+// [datetime relateed function]
+// manually update time and date when auto update failed
 // "29/08/14 18:31:00"
 void datetimeUpdate( byte i_dayOfWeek,
                      byte i_dayOfMonth,
