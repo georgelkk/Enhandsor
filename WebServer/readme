@@ -1,0 +1,104 @@
+Enhandsor
+
+Enhandsor is a persuasive that help poeple to improve their health habits.
+---------------------
+User
+---------------------
+	---------------------
+	Phone
+	---------------------
+		---------------------
+		SIM Card
+		---------------------
+	---------------------
+	Bottle
+	---------------------
+		---------------------
+		Micro Processor
+		---------------------
+		---------------------
+		GSM Module
+		---------------------
+		---------------------
+		SIM Card
+		---------------------
+		---------------------
+		Antenna
+		---------------------
+		---------------------
+		Switch
+		---------------------
+		---------------------
+		Tank
+		---------------------
+
+---------------------
+Researcher
+---------------------
+	---------------------
+	Web Server
+	---------------------
+		---------------------
+		Main Loop
+		---------------------
+		---------------------
+		Persuaasive
+		---------------------
+		---------------------
+		Database
+		---------------------
+		---------------------
+		SMS
+		---------------------
+		---------------------
+		Recharge
+		---------------------
+
+
+
+
+
+
+--------
+EC2 Server 
+--------
+
+	Main...(python tornado)
+		enhandsor_webserver.py
+		
+		include 	Presuasive, Recharge 
+		loop		SMSTwilio
+		parallel	Storage
+
+	Persuasive...(python)
+		
+
+	SMS...(python Twilio)
+		SMSTwilio.py 	API
+			Send SMS
+			Recive SMS
+
+
+	Recharge...(???)
+		Recharge user
+
+	Storage...(python mongoDB)
+		insert data
+		Database
+
+		what function do you need??
+		insert/del/query
+		insert data to db 
+
+
+
+Arduino
+
+Hi Sir/Ms,
+I am wondering if you have web api for mobile recharge that support india area.
+I am going to build a recharge server in research purpose.
+To recharge 1000 users for each day,for about 180 days.
+How should I do to access your API/service?
+Thank you,
+
+George

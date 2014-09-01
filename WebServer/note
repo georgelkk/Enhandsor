@@ -1,0 +1,70 @@
+As the only one software engineer in the team.
+We have to build this up. and perfect.
+
+curl -X POST https://api.twilio.com/2010-04-01/Accounts/ACecbbf33c08c3e0ad9e4322c1cb20711d/SMS/Messages.json \
+    -u ACecbbf33c08c3e0ad9e4322c1cb20711d:fdf1f8fd526dacf14015bf4d38531503 \
+    --data-urlencode "From=+16164266851" \
+    --data-urlencode "To=+14086099523" \
+    --data-urlencode 'Body=foobar wala'
+
+
+ 
+client.messages.create(
+    to="4086099523", 
+    from_="+16164266851", 
+    body="Timestamp:XXX , User: XXX",  
+)
+
+# get list of return
+messages = client.messages.list(  
+) 
+ 
+for m in messages: 
+    print m.sid
+
+# get (one)
+message = client.messages.get('SMf8200712918e42faa759a964db8fc759') 
+print message.body
+
+
+
+# for demo
+
+Human 		one click		arduino
+ardunio 	send SMS		server
+server 		check 			SMS
+server 		send SMS		phone
+
+
+# arduino
+GET 	Click
+SEND 	SMS
+
+
+# server
+LOOP Check SMS
+  IF NEW push:
+     Froward to new
+
+# message.?
+['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', u'account_sid', u'api_version', 'auth', 'base_uri', u'body', u'date_created', u'date_sent', u'date_updated', 'delete_instance', u'direction', u'error_code', u'error_message', 'from_', 'id_key', 'load', 'load_subresources', 'media_list', 'name', u'num_media', u'num_segments', 'parent', u'price', u'price_unit', 'request', u'sid', u'status', u'subresource_uris', 'subresources', 'timeout', u'to', 'update_instance', 'uri']
+
+MTNL    $0.01 per message
+S Tel   $0.01 per message
+Reliance    $0.01 per message
+Loop Mobile $0.01 per message
+Etisalat DB Telecom $0.01 per message
+BSNL    $0.01 per message
+Ping Mobile $0.01 per message
+MTS $0.01 per message
+Videocon    $0.01 per message
+Tata DoCoMo $0.01 per message
+Vodafone India  $0.01 per message
+Uninor  $0.01 per message
+Idea Cellular   $0.01 per message
+Tata indicom    $0.01 per message
+Aircel  $0.01 per message
+Airtel  $0.01 per message
+
+012721293
+7EPK440
