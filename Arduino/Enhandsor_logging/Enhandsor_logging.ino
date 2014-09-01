@@ -1,54 +1,59 @@
-//need to set up time when program a new chip
-
-//code V1 with analog pin connected to int1
-
-// power profile
-// sleep mode 800 uMA
-// active 20 mA
+// =====================================================
+// Enhandsor Logging Code
+// For Enahandsor Bottle prototype test in India
+// =====================================================
 // Nan-Wei Gong Feb 1st 2014
-//#include <stdio.h>
-#include <Time.h>
-#include <avr/interrupt.h>
-#include <avr/sleep.h>
-#include <avr/power.h>
-#include <SD.h>
-// For the SD Shield Plus
+// George Chang Sep.1st 2014 georgelkk4@gmail.ocm
+// code available on github:
+// https://github.com/georgelkk/Enhandsor
+// =====================================================
+// CODE NOTE:
+// 1. need to set up time when program a new chip
+// 2. code V1 with analog pin connected to int1
+// 3. set FORCE_UPDATE_DATETIME before upload code 
+//
+// POWER PROFILE:
+// sleep mode     800 uMA
+// active mode    20  mA
+// =====================================================
+// --------------------
+// include
+// --------------------
+//#include <stdio.h>        // c    lib  for time code  
+#include <Time.h>           // time lib  
+#include <avr/interrupt.h>  // interrupt for sleep code 
+#include <avr/sleep.h>      // sleep lib
+#include <avr/power.h>      // power lib for sleep code
+#include <SD.h>             // For the SD Shield Plus
 #include "Wire.h"
-
-#define DS1307_I2C_ADDRESS 0x68  // This is the I2C address
-//for system time sync
+// --------------------
+// define 
+// --------------------
+// I2C
+#define DS1307_I2C_ADDRESS 0x68  // This is the I2C address 
+//system time sync
 #define TIME_MSG_LEN  11   // time sync to PC is HEADER followed by unix time_t as ten ascii digits
 #define TIME_HEADER  255   // Header tag for serial time sync message
-
+// --------------------
+// Var
+// --------------------
 const int chipSelect = 4;
-
 int sleepStatus = 0;        // variable to store a request for sleep
 int led =9;
 int wakePin1 = 2;
 int wakePin2 = 3;
 int analogPin = 0;
 int button1 = 0;
-int button2 = 0;
-// This is to talk to the real time clock
-boolean FORCE_UPDATE_DATETIME= false;
-//
+int button2 = 0;            // This is to talk to the real time clock
+boolean FORCE_UPDATE_DATETIME= false;  // Force update in first time upload 
+// Global Variables 
+int i;   // ???
+byte m_second, m_minute, m_hour, m_dayOfWeek, m_dayOfMonth, m_month, m_year; 
+// current time and date you want to setup
 
-
-byte decToBcd(byte val)
-{
-  return ( (val/10*16) + (val%10) );
-}
-
-// Convert binary coded decimal to normal decimal numbers
-byte bcdToDec(byte val)
-{
-  return ( (val/16*10) + (val%16) );
-}
-
-// Global Variables
-int i;
-byte m_second, m_minute, m_hour, m_dayOfWeek, m_dayOfMonth, m_month, m_year;
-
+// --------------------
+// Arduino setup
+// --------------------
 void setup()
 {
   pinMode(led, OUTPUT);
@@ -60,7 +65,8 @@ void setup()
   // output, even if you don't use it:
   pinMode(chipSelect, OUTPUT);
   Serial.print("chipSelect set to output\n");
-
+  
+  // [SD card]
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect))
   {
@@ -70,39 +76,18 @@ void setup()
   }
   Serial.println("card initialized.\n");
   
-  
-  
-  // hand input time messsage 
-  /*
-  m_second = 50;
-  m_minute = 10;
-  m_hour = 14;
-  m_dayOfWeek = 5;
-  m_dayOfMonth = 29;
-  m_month = 8;
-  m_year = 14;
-  setDateDs1307(m_second, m_minute, m_hour, m_dayOfWeek, m_dayOfMonth, m_month, m_year);
-  Serial.println("date reset");
-  */
-  
-  //check or sync Date and Time with system 
-  //String Standard_datetime = "29/08/14 18:31:00";
-  //06/10/11 15:10:00
-  //DateUpdate(Standard_datetime);
-  //String PCTIME = getPCtime();
-  //Serial.println(PCTIME);
-  
-
+  // [TIME] 
+  // get linux system time 
   if(getPCtime())
-    Serial.println("CAN  GET TIME FROM PC");
+    Serial.println("CAN  GET TIME FROM linux");
   else 
-    Serial.println("CANT GET TIME FROM PC");
-    
+    Serial.println("CANT GET TIME FROM linux");
+  // Manual update datetime  
   datetimeUpdate(1,1,9,14, 14,32,00);
   //dayOfWeek,i_dayOfMonth, i_month,i_year,i_hour,i_minute,i_second)
 
-
-// for the interrupt
+  //[Inuterrupt]
+  // for the interrupt
   pinMode(wakePin1, INPUT);// button 1
   pinMode(wakePin2, INPUT);// button 2
 
@@ -110,8 +95,76 @@ void setup()
                                       // wakeUpNow when pin 2 gets HIGH
   attachInterrupt(1, wakeUpNow2, RISING); // use interrupt 1 (pin 2) and run function
                                       // wakeUpNow when pin 3 gets HIGH
+}
 
+// --------------------
+// main loop
+// --------------------
+void loop()
+{
+  // make a string for assembling the data to log:
+  String dataString = getDateDs1307();
+  dataString += String(",");
 
+  // read three sensors and append to the string:
+  int sensor = analogRead(analogPin);
+  
+  // sleep status control
+  if (sensor <= 100)
+    sleepStatus = 0;
+  else
+    sleepStatus = 1;
+    
+  // print data to SD card
+  dataString += String(sensor);
+  dataString += String(",");
+  dataString += String(button1);
+  dataString += String(",");
+  dataString += String(button2);
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("datalog1.csv", FILE_WRITE);
+  // if the file is available, write to it:
+  if (dataFile)
+  {
+    dataFile.println(dataString);
+    dataFile.close();
+  // print to the serial port too:
+  //  Serial.print("pressure sensor data");
+  //  Serial.println(dataString);
+  }
+  // if the file isn't open, pop up an error:
+  else
+  {
+    Serial.println("error opening datalog.csv");
+  }
+  
+  //    digitalWrite(led, LOW);
+  delay(50);
+
+  // set sleep
+  if (sleepStatus == LOW) 
+  {            // start to put the device in sleep
+    button1 = 0;
+    button2 = 0;
+    sleepNow();   // sleep function called here
+  }
+
+}
+// --------------------
+// unit function
+// --------------------
+
+// [utility function]
+byte decToBcd(byte val)
+{
+  return ( (val/10*16) + (val%10) );
+}
+
+// Convert binary coded decimal to normal decimal numbers
+byte bcdToDec(byte val)
+{
+  return ( (val/16*10) + (val%16) );
 }
 
 void wakeUpNow1()        // here the interrupt is handled after wakeup for both button you blink that LED for a bit
@@ -123,7 +176,6 @@ void wakeUpNow1()        // here the interrupt is handled after wakeup for both 
   digitalWrite(led, LOW);
   button1 = 1;
 }
-
 
 void wakeUpNow2()        // here the interrupt is handled after wakeup for both button you blink that LED for a bit
 {
@@ -141,76 +193,14 @@ void sleepNow()         // here we put the arduino to sleep
     sleep_enable();
     attachInterrupt(0,wakeUpNow1, RISING);
     attachInterrupt(1,wakeUpNow2, RISING);
-//    power_adc_disable();
-//    power_spi_disable();
-//    power_timer0_disable();
-//    power_timer1_disable();
-//    power_timer2_disable();
-//    power_twi_disable();
-
+    
     sleep_mode();                // here the device is actually put to sleep!!
     sleep_disable();             // first thing after waking from sleep:
     detachInterrupt(0);
     detachInterrupt(1);
 }
 
-
-void loop()
-{
-  // make a string for assembling the data to log:
-  String dataString = getDateDs1307();
-  dataString += String(",");
-
-  // read three sensors and append to the string:
-  int sensor = analogRead(analogPin);
-
-  if (sensor <= 100){
-    sleepStatus = 0;
-  } else
-    sleepStatus = 1;
-
-    dataString += String(sensor);
-    dataString += String(",");
-    dataString += String(button1);
-    dataString += String(",");
-    dataString += String(button2);
-
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  File dataFile = SD.open("datalog1.csv", FILE_WRITE);
-
-  // if the file is available, write to it:
-  if (dataFile)
-  {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-  //  Serial.print("pressure sensor data");
-  //  Serial.println(dataString);
-  }
-  // if the file isn't open, pop up an error:
-  else
-  {
-    Serial.println("error opening datalog.csv");
-  }
-  // time sync
-  /*
-  if(getPCtime())
-    Serial.println("CAN!!!!  GET TIME FROM PC");
-  else 
-    Serial.println("CANT     GET TIME FROM PC");
-    */
-//    digitalWrite(led, LOW);
-  delay(50);
-
-   if (sleepStatus == LOW) {            // start to put the device in sleep
-      button1 = 0;
-      button2 = 0;
-      sleepNow();                      // sleep function called here
-      }
-
-}
-
+// [unit function]
 // "29/08/14 18:31:00"
 void datetimeUpdate( byte i_dayOfWeek,
                      byte i_dayOfMonth,
@@ -263,7 +253,6 @@ void datetimeUpdate( byte i_dayOfWeek,
  
 }
 
-
 // Gets the date and time from the ds1307 and return
 // result in a format a spreadsheet can parse: 06/10/11 15:10:00
 String getDateDs1307()
@@ -302,7 +291,6 @@ String getDateDs1307()
 }
 
 
-
 String Print2Digit(byte Val)
 {
   String dataString = "";
@@ -335,7 +323,8 @@ void setDateDs1307(byte m_second,        // 0-59
    Wire.endTransmission();
 }
 
-boolean getPCtime() {
+boolean getPCtime() 
+{
   // if time sync available from serial port, update time and return true
   while(Serial.available() >=  TIME_MSG_LEN ){  // time message consists of a header and ten ascii digits
     if( Serial.read() == TIME_HEADER ) {        
