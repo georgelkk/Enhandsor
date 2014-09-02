@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #=====================================================
 # George   2014.08
-# Twilio (616) 426-6851
+# Twilio ###-###-####
 # Main interface with user
 # Basic function: get SMS / Send SMS
 # 
@@ -17,8 +17,8 @@ import threading
 from SMSTwilio import SMSTwilio
 from twilio.rest import TwilioRestClient 
 #  globle var
-twilio_para = { 'ACCOUNT_SID' : "ACecbbf33c08c3e0ad9e4322c1cb20711d",
-                'AUTH_TOKEN'  : "fdf1f8fd526dacf14015bf4d38531503",
+twilio_para = { 'ACCOUNT_SID' : "OOOOOOOOOO",
+                'AUTH_TOKEN'  : "XXXXXXXXXX",
 }
 
 #words
@@ -27,15 +27,9 @@ _WASH_T = ', here is the recharge XXXX!'
 #========================================
 # var for demo 
 massage_mids = []
-# +14086099523  George
-# +16175289734  Giovanni
-# +917278589579 Natalia(India)
-# +16164266851  Twilio SMS (George's trial AC) 
-# +18572061017  Jenny's phone
-# +34590100003  Telefonia
-Bottle_Num = '+14086099523'
-client_Num = '+917278589579'
-Server_Num = '+16164266851'
+Bottle_Num = '+############'
+client_Num = '+############'
+Server_Num = '+############'
 #========================================
 
 #init 
