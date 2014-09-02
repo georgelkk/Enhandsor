@@ -56,8 +56,27 @@ Researcher
 
 
 
+W      = A*V
+W*h    = A*V*h 
+3.1 Wh = 0.850 A   * 0.37 V * 1 hour
+
+3.1 wh = 0.00108 A * 0.37 V * n hour    H:L = 1:9
+n = 834 hour
+
+3.1 wh = 0.00501  A * 0.37 V * n hour    H:L = 5:5
+n = 169 hour
+
+3.1 wh = 0.002   A * 0.37 V * n hour    H:L = 10:0
+n = 85  hour
 
 
+
+
+high	           10   mA  = 0.01 A
+low 	20  umA  = 0.02 mA  = 0.00002 A
+
+general =  0.01 *0.1 + 0.00002*0.9
+        =  0.001018
 
 --------
 EC2 Server 
