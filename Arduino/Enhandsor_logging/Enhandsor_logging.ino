@@ -13,8 +13,9 @@
 // 3. set FORCE_UPDATE_DATETIME before upload code 
 //
 // POWER PROFILE:
-// sleep  mode     800 uMA
-// active mode      20  mA
+// sleep  mode     800 uMA    // 20 umA
+// active mode      20  mA    // 10 mA 
+// 
 // =====================================================
 // --------------------
 // include
@@ -39,7 +40,7 @@
 // --------------------
 const int chipSelect = 4;
 int sleepStatus = 0;        // variable to store a request for sleep
-int led =9;
+int led =5;                 // debug led
 int button1 = 0;
 int button2 = 0;            // This is to talk to the real time clock
 int wakePin1 = 2;
@@ -67,8 +68,7 @@ void setup()
   
   // [SD card]
   // see if the card is present and can be initialized:
-  if (!SD.begin(chipSelect))
-  {
+  if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present\n");
     // don't do anything more:
     return;
@@ -82,7 +82,7 @@ void setup()
   else 
     Serial.println("CANT GET TIME FROM linux");
   // Manual update datetime  
-  datetimeUpdate(1,1,9,14, 14,32,00);
+  datetimeUpdate(2,2,9,14, 14,30,00);
   //dayOfWeek,i_dayOfMonth, i_month,i_year,i_hour,i_minute,i_second)
 
   //[Inuterrupt]
@@ -123,26 +123,31 @@ void loop()
   // so you have to close this one before opening another.
   File dataFile = SD.open("datalog1.csv", FILE_WRITE);
   // if the file is available, write to it:
-  if (dataFile)
-  {
+  if (dataFile) {
     dataFile.println(dataString);
     dataFile.close();
-  // print to the serial port too:
-  //  Serial.print("pressure sensor data");
-  //  Serial.println(dataString);
   }
-  // if the file isn't open, pop up an error:
-  else
-  {
+  else // if the file isn't open, pop up an error:
     Serial.println("error opening datalog.csv");
-  }
   
+  /*
+  Serial.print("Info: ");
+  Serial.print(ADCSRA);
+  Serial.print(" ");
+  Serial.print(ADEN);
+  //Serial.print(" ");
+  //Serial.print(~(1 << ADEN));
+  Serial.print(" ");
+  Serial.println(sleepStatus);
+  
+  */
   //    digitalWrite(led, LOW);
+  
   delay(50);
+  
 
   // set sleep
-  if (sleepStatus == LOW) 
-  {            // start to put the device in sleep
+  if (sleepStatus == LOW) {      // start to put the device in sleep
     button1 = 0;
     button2 = 0;
     sleepNow();   // sleep function called here
@@ -191,6 +196,9 @@ void sleepNow()         // here we put the arduino to sleep
 {
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
     sleep_enable();
+    
+    //ADCSRA &= ~(1 << ADEN);
+    // // ADCSRA = ADCSRA & ~(1^(ADEN))
     attachInterrupt(0,wakeUpNow1, RISING);
     attachInterrupt(1,wakeUpNow2, RISING);
     
@@ -226,8 +234,7 @@ void datetimeUpdate( byte i_dayOfWeek,
   m_year       = bcdToDec(Wire.read());
   
   //sync
-  if((m_year == i_year) && (m_month == i_month) && !FORCE_UPDATE_DATETIME)
-  {
+  if((m_year == i_year) && (m_month == i_month) && !FORCE_UPDATE_DATETIME) {
     Serial.println(m_year);
     Serial.println(i_year);
     Serial.println(m_month);
@@ -235,9 +242,7 @@ void datetimeUpdate( byte i_dayOfWeek,
     Serial.println(FORCE_UPDATE_DATETIME);
     Serial.println("month and year already update.");
   }
-  else
-  {
-    
+  else {
     if(FORCE_UPDATE_DATETIME)
       Serial.println("Force update.");
     else
@@ -295,10 +300,10 @@ String getDateDs1307()
 String Print2Digit(byte Val)
 {
   String dataString = "";
+  
   if (Val < 10)
-  {
     dataString = "0";
-  }
+
   dataString += String(Val, DEC);
   return dataString;
 }
