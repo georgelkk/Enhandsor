@@ -10,11 +10,11 @@
 from twilio.rest import TwilioRestClient 
  
 # put your own credentials here 
-# ACCOUNT_SID = "ACecbbf33c08c3e0ad9e4322c1cb20711d" 
-# AUTH_TOKEN = "fdf1f8fd526dacf14015bf4d38531503" 
+# ACCOUNT_SID = "XXXXXXXXX" 
+# AUTH_TOKEN = "XXXXXXXXX" 
 # client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN) 
-twilio_para = {   'ACCOUNT_SID' : "ACecbbf33c08c3e0ad9e4322c1cb20711d",
-                'AUTH_TOKEN' : "fdf1f8fd526dacf14015bf4d38531503",
+twilio_para = {   'ACCOUNT_SID' : "XXXXXXXX",
+                'AUTH_TOKEN' : "XXXXXXX",
 }
 
 # send
@@ -32,8 +32,8 @@ class SMSTwilio():
 
     def send_message(self,to_Num,from_Num,body):
         self.client.messages.create(
-            #to="4086099523", 
-            #from_="+16164266851", 
+            #to="408XXXXXXXX", 
+            #from_="+1616XXXXXXXX", 
             #body="Timestamp:XXX , User: XXX",  
             to=to_Num, 
             from_=from_Num, 
@@ -69,19 +69,19 @@ if __name__ == "__main__":
     SMS = SMSTwilio()
     
     # test send
-    #SMS.send_message('4086099523','+16164266851','Python test 08/04 night')
+    #SMS.send_message('408XXXXXXX','+1616XXXXXX','Python test 08/04 night')
     # test get list
     mids = SMS.get_messages_mid()
     print mids
     print len(mids) # 8
     # test get one
-    #SMS.get_message('SMf8200712918e42faa759a964db8fc759')
+    #SMS.get_message('XXXXXXXXXX')
     #for mid in mids: print SMS.get_message(mid)
-    curr_SMS = SMS.get_message('SMff3a42b17498950b7b29cdc5fb30dafa')
+    curr_SMS = SMS.get_message('XXXXXXXX')
     print curr_SMS.body
     print curr_SMS.from_
     print type(curr_SMS.from_)
-    #print SMS.get_message('SM1368b4b17cb8f4e585dc25911a92b167')
+    #print SMS.get_message('XXXXXXXX')
 
 
     # do main flow here
